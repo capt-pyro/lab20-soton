@@ -25,19 +25,14 @@ int main(int argc, char *argv[])
 {
 
     qRegisterMetaType<Pixel>(); //Enable or tell qt that pixel exists for signal/slot
-    // setup GPIO interface - uncomment when needed
-    // needs to run with root via sudo in terminal.
-    //wiringPiSetup();
-    //pinMode (0, OUTPUT);
     QApplication a(argc, argv);
     Window w;
     Model model;
     Controller ctrl(&model,&w);
     w.setController(&ctrl);
     w.setModel(&model);
-
+/*
     // starting worker thread(s)
-
     SendReceive::instance()->setController(&ctrl);
     int rc;
     pthread_t worker_thread;
@@ -46,9 +41,7 @@ int main(int argc, char *argv[])
         qDebug() << "Unable to start worker thread.";
         exit(1);
     }
-
-    std::cout << "Before sendworker thread " <<std::endl;
-    //SendReceive::instance()->transferPixel(w.getScribbleArea()->getPixelQueue());
+*/
     // setup Qt GUI
 
 

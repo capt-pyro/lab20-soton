@@ -14,18 +14,22 @@ public:
     QPoint getPoint();
     void setColor(QColor color);
     QColor getColor();
-    void setLastPBool(int);
-    int getLastPBool();
+    /*void setPrevPoint(QPoint);
+    QPoint getPrevPoint();
+    */
+    void setPrevPBool(int b);
+    int getPrevPBool();
 
     void serialize(std::vector<char>& buf);
-
     void deSerialize(std::vector<char>& buf);
+
 private:
     QPoint point;
     QColor color;
-    int lastPBool;//new last point scribble
+    //QPoint prevPoint;//new last point scribble
+    int prevPointBool;
 };
 
-Q_DECLARE_METATYPE(Pixel);// signal/slot handling new
+Q_DECLARE_METATYPE(Pixel);// signal/slot handling
 
 #endif // PIXEL_H

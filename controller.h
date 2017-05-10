@@ -4,6 +4,8 @@
 #include "model.h"
 #include "window.h"
 #include "pixel.h"
+#include <QPoint>
+#include <mutex>
 
 class Model;
 class Window;
@@ -19,6 +21,8 @@ public:
 private:
   Model* model;
   Window *window;
+  QPoint prevP;
+  std::mutex imageMutex;
 };
 
 #endif // CONTROLLER_H

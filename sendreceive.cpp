@@ -11,6 +11,7 @@
 #include <QDebug>
 #include <bitset>
 #include <queue>
+#include <mutex>
 #include <pthread.h>
 #include "common.h"
 
@@ -21,7 +22,7 @@ std::bitset<8> ToBits(unsigned char byte)
 {
     return std::bitset<8>(byte);
 }
-
+std::queue<Pixel> pixQueue;
 
 void* sendWorker(void* ptr)
 {
@@ -37,7 +38,7 @@ void* sendWorker(void* ptr)
     pthread_exit(NULL);
 }
 
-std::queue<Pixel> pixQueue;
+
 
 SendReceive::~SendReceive(){}
 
@@ -72,12 +73,12 @@ SendReceive::SendReceive() {
 }
 
 void SendReceive::send(Pixel pixel) {
-        std::cout << "Pixel avaiable in queue" << std::endl;
+        //std::cout << "Pixel avaiable in queue" << std::endl;
         std::vector<char> buf;
         pixel.serialize(buf);
         binaryPutChar((char)ALPHA);//tells other pi to start reading
 
-        std::cout << buf.size() << std::endl;
+        //std::cout << buf.size() << std::endl;
         for(int i =0;i<buf.size();i++) {
             binaryPutChar(buf[i]);
         }
@@ -86,6 +87,7 @@ void SendReceive::send(Pixel pixel) {
 }
 
 void SendReceive::receive() {
+
     std::vector<char> vect;
     int state = 0;
     while(1) {
@@ -102,15 +104,16 @@ void SendReceive::receive() {
             Pixel pixel;
             pixel.deSerialize(vect);
 
-            std::cout << "done: " << std::endl;
             std::cout << "X val " << pixel.getPoint().x() <<
                          "Y val " << pixel.getPoint().y() <<
-                         "Color " << pixel.getColor().name().toStdString() << std::endl;
+                         "Color " << pixel.getColor().name().toStdString() << "Bool" << pixel.getPrevPBool()<< std::endl;
 
-            vect.clear();
-            //Used instead of SIGNAL/SLOT if needed
-            //this->controller->updatePixel(pixel);
-
+            /*if(pixel.getPoint().x() >1000 || pixel.getPoint().y() >1000 || pixel.getPrevPoint().x() > 1000 || pixel.getPrevPoint().y() > 1000) {
+                std::cout << "Pixel" << std::endl;
+                std::cout <<  "currPoint x" << pixel.getPoint().x() << " prevPoint " << pixel.getPrevPoint().x() << std::endl;
+                std::cout <<  "currPoint x" << pixel.getPoint().y() << " prevPoint " << pixel.getPrevPoint().y() << std::endl;
+            }*/
+            vect.clear();            
             emit foundPixel(pixel);
         }
         else if(state == 1) {
@@ -124,12 +127,12 @@ void SendReceive::receive() {
 
 void SendReceive::processPixel(Pixel pixel)
 {
-    std::cout << "Inside processPixel slot" << std::endl;
+    //std::cout << "Inside processPixel slot" << std::endl;
     this->controller->updatePixel(pixel);
 }
 
 void SendReceive::transferPixel(/*std::queue<Pixel> pixQueue*/) {
-    std::cout << "ENTERED TRANSFERPIXEL" << std::endl;
+    //std::cout << "ENTERED TRANSFERPIXEL" << std::endl;
     //std::cout << "Pixel color" << pixel.getPoint().x() << std::endl;
     int deal;
     pthread_t row_thread;
@@ -138,7 +141,7 @@ void SendReceive::transferPixel(/*std::queue<Pixel> pixQueue*/) {
         qDebug() << "Unable to start worker thread.";
         exit(1);
     }
-    std::cout << "EXITING TRANSFERPIXEL" << std::endl;
+   // std::cout << "EXITING TRANSFERPIXEL" << std::endl;
     //Don't join the thread back as it will block the ui.
 }
 

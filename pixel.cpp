@@ -1,12 +1,11 @@
 #include <pixel.h>
 #include <iostream>
 
-    //virtual ~Pixel();
     Pixel::Pixel(){}
 
     void Pixel::serialize(std::vector<char>& buf) {
         // The buffer we will be writing bytes into
-        char outBuf[sizeof(int)+sizeof(int)+8*sizeof(char) +sizeof(int)];
+        char outBuf[(8*sizeof(char)) + (3*sizeof(int))];
 
         // A pointer we will advance whenever we write data
         char *p = outBuf;
@@ -30,19 +29,30 @@
         p += sizeof(col);
 
         //lastpoint Serialize
-        int lP = this->getLastPBool();
-        std::cout << "Lastpbool " << lP << std::endl;
-        memcpy(p,&lP,sizeof(int));
+/*        int lPx = this->prevPoint.x();
+        std::cout << "PrevPoint " << lPx << std::endl;
+        memcpy(p,&lPx,sizeof(int));
+        p += sizeof(int);
+
+        int lPy = this->prevPoint.y();
+        std::cout << "PrevPoint " << lPy << std::endl;
+        memcpy(p,&lPy,sizeof(int));
+        p += sizeof(int);
+*/
+        int pB = this->prevPointBool;
+       // std::cout << "PrevPoint " << lPy << std::endl;
+        memcpy(p,&pB,sizeof(int));
         p += sizeof(int);
 
         for(int i=0; i< p-outBuf; i++) {
             buf.push_back(outBuf[i]);
         }
     }
+
 //DESERIALIZE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     void Pixel::deSerialize(std::vector<char>& buf) {
         int size = buf.size();
-        char outBuf[sizeof(int)+sizeof(int)+8*sizeof(char) +sizeof(int)];
+        char outBuf[(8*sizeof(char)) + (3*sizeof(int))];
 
         for(int i=0; i< size; i++) {
             outBuf[i] = buf[i];
@@ -70,11 +80,20 @@
         p += sizeof(col);
 
         //lastpoint Deserialize
-        int t;
-        memcpy(&t,p,sizeof(int));
-        this->setLastPBool(t);
-        std::cout << "deserial lastp " << t << std::endl;
+/*        int tx;
+        memcpy(&tx,p,sizeof(int));
+        this->prevPoint.setX(tx);        
+        p += sizeof(int);
 
+        int ty;
+        memcpy(&ty,p,sizeof(int));
+        this->prevPoint.setY(ty);
+        p += sizeof(int);
+        */
+        int lPB;
+        memcpy(&lPB,p,sizeof(int));
+        this->setPrevPBool(lPB);
+        p += sizeof(int);
     }
 //Start of Getter/Setter
     void Pixel::setPoint(QPoint point){
@@ -92,11 +111,18 @@
     QColor Pixel::getColor(){
         return this->color;
     }
-    void Pixel::setLastPBool(int b) {
-        this->lastPBool = b;
+/*    void Pixel::setPrevPoint(QPoint b) {
+        this->prevPoint = b;
     }
-    int Pixel::getLastPBool() {
-        return this->lastPBool;
-    }
+    QPoint Pixel::getPrevPoint() {
+        return this->prevPoint;
+    }*/
+
+    void Pixel::setPrevPBool(int b) {
+          this->prevPointBool = b;
+      }
+    int Pixel::getPrevPBool() {
+          return this->prevPointBool;
+      }
 
     //End of Getter/Setter

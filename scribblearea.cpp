@@ -29,7 +29,6 @@ void ScribbleArea::setPenWidth(int newWidth)
 void ScribbleArea::clearImage()
 {
     window->getController()->wipeImage();
-    modified = true;
     update();
 }
 
@@ -37,13 +36,12 @@ void ScribbleArea::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
         lastPoint = event->pos();
-        /*
         Pixel pixel;
-        pixel.setLastPBool(1);
+        pixel.setPrevPBool(1);
         pixel.setColor(myPenColor);
+        //QPoint qp(10,10);
         pixel.setPoint(lastPoint);
         pixQueue.push(pixel);
-        */
         scribbling = true;//trigger boolean that starts recording mousemoveevents.
     }
 }
@@ -51,18 +49,14 @@ void ScribbleArea::mousePressEvent(QMouseEvent *event)
 void ScribbleArea::mouseMoveEvent(QMouseEvent *event)
 {
     if ((event->buttons() & Qt::LeftButton) && scribbling) {
-        //SendReceive::instance()->transferPixel(drawLineTo(event->pos()));
-        //pixelQueue.push(drawLineTo(event->pos()));
-        pixQueue.push(lastPoint, drawLineTo(event->pos()),true);
+        pixQueue.push(drawLineTo(lastPoint,event->pos(),true,myPenColor));
     }
 }
 
 void ScribbleArea::mouseReleaseEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton && scribbling) {
-        //SendReceive::instance()->transferPixel(drawLineTo(event->pos()));
-        //pixelQueue.push(drawLineTo(event->pos()));
-        pixQueue.push(drawLineTo(event->pos()));
+        pixQueue.push(drawLineTo(lastPoint, event->pos(),true,myPenColor));
         scribbling = false;
     }
 }
@@ -85,10 +79,9 @@ void ScribbleArea::resizeEvent(QResizeEvent *event)
     QWidget::resizeEvent(event);
 }
 
-Pixel ScribbleArea::drawLineTo(QPoint prevPoint,const QPoint &endPoint,bool uiSource)
-{
+Pixel ScribbleArea::drawLineTo(QPoint prevPoint,const QPoint &endPoint,bool uiSource, QColor lineColor) {
     QPainter painter(window->getModel()->getImage());
-    painter.setPen(QPen(myPenColor, myPenWidth, Qt::SolidLine, Qt::RoundCap,
+    painter.setPen(QPen(lineColor, myPenWidth, Qt::SolidLine, Qt::RoundCap,
                         Qt::RoundJoin));
     painter.drawLine(prevPoint, endPoint);
     modified = true;
@@ -96,13 +89,15 @@ Pixel ScribbleArea::drawLineTo(QPoint prevPoint,const QPoint &endPoint,bool uiSo
     int rad = (myPenWidth / 2) + 2;
     update(QRect(prevPoint, endPoint).normalized()
                                      .adjusted(-rad, -rad, +rad, +rad));
-    if(uiSource) {
-        lastPoint = endPoint;
-    }
     Pixel pixel;
     pixel.setPoint(endPoint);
     pixel.setColor(myPenColor);
-    pixel.setLastPBool(0);
+    //pixel.setPrevPoint(lastPoint);
+    pixel.setPrevPBool(0);
+
+    if(uiSource) {
+        lastPoint = endPoint;
+    }
     return pixel;
 }
 
@@ -121,4 +116,3 @@ void ScribbleArea::resizeImage(QImage *image, const QSize &newSize)
 void ScribbleArea::setLastPoint(QPoint lP) {
     lastPoint = lP;
 }
-

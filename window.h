@@ -27,8 +27,6 @@ public:
     Model* getModel();
     ScribbleArea* getScribbleArea();
 
-private slots:
-    void on_actionClear_triggered();
 
 private:
     Controller*  controller;
@@ -36,7 +34,10 @@ private:
     Ui::Window *ui;
     ScribbleArea *scribbleArea;
 
-protected:
+private slots:
+    void on_actionClearScreen_triggered();
+    void on_actionPenColor_triggered();
+    void on_actionPenWidth_triggered();
 };
 
 #endif // WINDOW_H

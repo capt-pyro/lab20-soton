@@ -21,16 +21,12 @@ public:
 
     void setPenColor(const QColor &newColor);
     void setPenWidth(int newWidth);
-
+    void clearImage();
     bool isModified() const { return modified; }
     QColor penColor() const { return myPenColor; }
     int penWidth() const { return myPenWidth; }
-    Pixel drawLineTo(QPoint prevPoint, const QPoint &endPoint, bool uiSource);
+    Pixel drawLineTo(QPoint prevPoint, const QPoint &endPoint, bool uiSource, QColor lineColor);
     void setLastPoint(QPoint);
-    //std::queue<Pixel> getPixelQueue();
-
-public slots:
-    void clearImage();
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
